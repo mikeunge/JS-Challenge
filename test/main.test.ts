@@ -135,3 +135,31 @@ test('add regular object value', () => {
 	}
 	expect(update(baseObj, changes)).toMatchObject(updatedObj);
 });
+
+test('update regular object value', () => {
+	const baseObj = {
+		a: {
+			b: [
+				{ _id: '5dc0ad700000000000000000', name: 'asdf1' },
+				{ _id: '5dc0ad700000000000000001', name: 'asdf2' },
+				{ _id: '5dc0ad700000000000000002', name: 'asdf3' }
+			]
+		},
+		value: 'hui'
+	};
+	const changes = {
+		"a.c": "hallo-changed"
+	};
+	const updatedObj = {
+		"a": {
+			"b": [
+				{ "_id": "5dc0ad700000000000000000", "name": "asdf1" },
+				{ "_id": "5dc0ad700000000000000001", "name": "asdf2" },
+				{ "_id": "5dc0ad700000000000000002", "name": "asdf3" }
+			],
+			"c": "hallo-changed"
+		},
+		"value": "hui"
+	}
+	expect(update(baseObj, changes)).toMatchObject(updatedObj);
+});
