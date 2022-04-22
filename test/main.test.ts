@@ -1,6 +1,6 @@
 import { update } from '../src/main';
 
-test('add title to a.b[_id] and remove name', () => {
+test('apply update / change array object', () => {
 	const baseObj = {
 		a: {
 			b: [
@@ -27,7 +27,7 @@ test('add title to a.b[_id] and remove name', () => {
 	expect(update(baseObj, changes)).toMatchObject(updatedObj);
 });
 
-test('add titleValue to a.b[_id]', () => {
+test('apply update / change array value', () => {
 	const baseObj = {
 		a: {
 			b: [
@@ -54,7 +54,7 @@ test('add titleValue to a.b[_id]', () => {
 	expect(update(baseObj, changes)).toMatchObject(updatedObj);
 });
 
-test('add new entry to array', () => {
+test('add an array entry', () => {
 	const baseObj = {
 		a: {
 			b: [
@@ -82,7 +82,7 @@ test('add new entry to array', () => {
 	expect(update(baseObj, changes)).toMatchObject(updatedObj);
 });
 
-test('remove from array', () => {
+test('remove array entry', () => {
 	const baseObj = {
 		a: {
 			b: [
@@ -102,6 +102,34 @@ test('remove from array', () => {
 				{ "_id": "5dc0ad700000000000000000", "name": "asdf1" },
 				{ "_id": "5dc0ad700000000000000002", "name": "asdf3" }
 			]
+		},
+		"value": "hui"
+	}
+	expect(update(baseObj, changes)).toMatchObject(updatedObj);
+});
+
+test('add regular object value', () => {
+	const baseObj = {
+		a: {
+			b: [
+				{ _id: '5dc0ad700000000000000000', name: 'asdf1' },
+				{ _id: '5dc0ad700000000000000001', name: 'asdf2' },
+				{ _id: '5dc0ad700000000000000002', name: 'asdf3' }
+			]
+		},
+		value: 'hui'
+	};
+	const changes = {
+		"a.c": "hallo"
+	};
+	const updatedObj = {
+		"a": {
+			"b": [
+				{ "_id": "5dc0ad700000000000000000", "name": "asdf1" },
+				{ "_id": "5dc0ad700000000000000001", "name": "asdf2" },
+				{ "_id": "5dc0ad700000000000000002", "name": "asdf3" }
+			],
+			"c": "hallo"
 		},
 		"value": "hui"
 	}

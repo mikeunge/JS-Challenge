@@ -4,7 +4,6 @@ export const update = (baseObj: object, updateObj: object): object => {
 		let currentPath = pathArr[0];
 
 		if (isArr) {
-			isArr = false;
 			if (id == '' || id == null) {  // check if we have an id, if not, append to array
 				if (Array.isArray(obj)) {
 					obj.push(value)
@@ -68,6 +67,9 @@ export const update = (baseObj: object, updateObj: object): object => {
 			newPath.shift();
 			//@ts-ignore
 			set(obj[currentPath], newPath.join('.'), value, chain, isArr, id);
+		} else if (!isArr) {
+			//@ts-ignore
+			obj[currentPath] = value;
 		}
 
 		return obj;
