@@ -18,12 +18,12 @@ test('add title to a.b[_id] and remove name', () => {
 	const updatedObj = {
 		"a": {
 			"b": [
-				{ "_id": "5dc0ad700000000000000000", "title": "asdf1-updated" }, // name got removed, all other objects got overwritten, _id is still automatically applid though
+				{ "_id": "5dc0ad700000000000000000", "title": "asdf1-updated" },
 				{ "_id": "5dc0ad700000000000000001", "name": "asdf2" },
 				{ "_id": "5dc0ad700000000000000002", "name": "asdf3" }
 			]
 		},
 		"value": "hui"
 	}
-	expect(update(baseObj, changes)).toBe(updatedObj);
+	expect(update(baseObj, changes)).toMatchObject(updatedObj);
 });
