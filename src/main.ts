@@ -5,6 +5,12 @@ export const update = (baseObj: object, updateObj: object): object => {
 
 		if (isArr) {
 			isArr = false;
+			if (id == '' || id == null) {  // check if we have an id, if not, append to array
+				if (Array.isArray(obj)) {
+					obj.push(value)
+				}
+				return obj;
+			}
 			//@ts-ignore
 			for (let i = 0; i < obj.length; i++) {
 				//@ts-ignore
@@ -20,20 +26,23 @@ export const update = (baseObj: object, updateObj: object): object => {
 
 					const val = Object.values(value).join('')
 					//@ts-ignore
-					if (obj[i][key]) {
+					if (obj[i][key] && !chain) {
 						// if we have a null/undefined as our value, we set an empty object
 						if (val == null || val == undefined) {
-							//@ts-ignore
+					//@ts-ignore
 							obj[i] = {}
 						} else {
-							//@ts-ignore
+					//@ts-ignore
 							obj[i][key] = val
 						}
+					} else if (chain){
+					//@ts-ignore
+						obj[i][key] = val
 					} else {
 						// create the new object in-place of the old one
-						//@ts-ignore
+					//@ts-ignore
 						obj[i] = { '_id': id}
-						//@ts-ignore
+					//@ts-ignore
 						obj[i][key] = val
 					}
 				}
