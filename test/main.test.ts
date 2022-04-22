@@ -81,3 +81,29 @@ test('add new entry to array', () => {
 	}
 	expect(update(baseObj, changes)).toMatchObject(updatedObj);
 });
+
+test('remove from array', () => {
+	const baseObj = {
+		a: {
+			b: [
+				{ _id: '5dc0ad700000000000000000', name: 'asdf1' },
+				{ _id: '5dc0ad700000000000000001', name: 'asdf2' },
+				{ _id: '5dc0ad700000000000000002', name: 'asdf3' }
+			]
+		},
+		value: 'hui'
+	};
+	const changes = {
+		"a.b[5dc0ad700000000000000001]": null
+	};
+	const updatedObj = {
+		"a": {
+			"b": [
+				{ "_id": "5dc0ad700000000000000000", "name": "asdf1" },
+				{ "_id": "5dc0ad700000000000000002", "name": "asdf3" }
+			]
+		},
+		"value": "hui"
+	}
+	expect(update(baseObj, changes)).toMatchObject(updatedObj);
+});

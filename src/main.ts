@@ -16,6 +16,13 @@ export const update = (baseObj: object, updateObj: object): object => {
 				//@ts-ignore
 				if (obj[i]._id == id) { // check if the id matches
 
+					if (value == null) {
+						if (Array.isArray(obj)) {
+							obj.splice(i, 1);
+						}
+						return obj; 
+					}
+
 					let key;
 					if (chain) {
 						// if we 'chain' behind the array, we need to SET/UPDATE a value, so we set the chained value as our key
@@ -27,22 +34,16 @@ export const update = (baseObj: object, updateObj: object): object => {
 					const val = Object.values(value).join('')
 					//@ts-ignore
 					if (obj[i][key] && !chain) {
-						// if we have a null/undefined as our value, we set an empty object
-						if (val == null || val == undefined) {
-					//@ts-ignore
-							obj[i] = {}
-						} else {
-					//@ts-ignore
-							obj[i][key] = val
-						}
+						//@ts-ignore
+						obj[i][key] = val
 					} else if (chain){
-					//@ts-ignore
+						//@ts-ignore
 						obj[i][key] = val
 					} else {
 						// create the new object in-place of the old one
-					//@ts-ignore
+						//@ts-ignore
 						obj[i] = { '_id': id}
-					//@ts-ignore
+						//@ts-ignore
 						obj[i][key] = val
 					}
 				}
