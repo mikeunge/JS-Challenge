@@ -1,52 +1,56 @@
 export const update = (baseObj: object, updateObj: object): object => {
-	function set (obj: object, path: string, value: string, chain: boolean, isArr: boolean, id: string) {
+	const set = (obj: object, path: string, value: string, chain: boolean, isArr: boolean, id: string): object => {
+		// setValue :: set a value or delete it, depents on the value that gets passed
+		const setValue = (obj: object, key: string, value: string | Array<string> | object | Array<null> | null) => {
+			//@ts-ignore
+			isEmpty(value) ? delete obj[key] : obj[key] = value;
+		}
+
+		// hasNext :: check if there is another element in the array (>1 elem in array)
+		const hasNext = (arr: Array<string> | null): boolean => {
+			return Array.isArray(arr)
+				? arr.length > 1 ? true : false
+				: false;
+		}
+
+		// isEmpty :: do we have a value or not
+		const isEmpty = (e: string | null): boolean => {
+			return e == '' || e === null || e === undefined ? true : false;
+		}
+
 		const pathArr = path.split('.');
 		let currentPath = pathArr[0];
+		let valueSet = false;
 
-		if (isArr) {
-			if (id == '' || id === null) {  // check if we have an id, if not, append to array
-				if (Array.isArray(obj)) {
-					obj.push(value)
-				}
+		if (isArr && Array.isArray(obj)) {
+			if (isEmpty(id)) {  // check if we have an id, if not, append to array
+				obj.push(value)
 				return obj;
 			}
-			//@ts-ignore
-			for (let i = 0; i < obj.length; i++) {
-				//@ts-ignore
-				if (obj[i]._id == id) { // check if the id matches
 
-					if (value === null || value === undefined) {
-						if (Array.isArray(obj)) {
-							obj.splice(i, 1);
-						}
+			// loop over the array 
+			for (let i = 0; i < obj.length; i++) {
+				if (obj[i]._id == id) { // check if the id matches
+					// is the value null/undefined? -- if so, we delete the array entry
+					if (isEmpty(value)) {
+						obj.splice(i, 1);
 						return obj; 
 					}
 
-					let key;
-					if (chain) {
-						// if we 'chain' behind the array, we need to SET/UPDATE a value, so we set the chained value as our key
-						key = pathArr[pathArr.length - 1]
-					} else {
-						key = Object.keys(value)[0]
-					}
-
+					// if we 'chain' behind the array, we need to SET/UPDATE a value, so we set the chained value as our key
+					const key = chain ? currentPath : Object.keys(value)[0];
 					const val = Object.values(value).join('')
-					//@ts-ignore
-					if (obj[i][key] && !chain) {
-						//@ts-ignore
-						obj[i][key] = val
-					} else if (chain){
-						//@ts-ignore
-						obj[i][key] = val
+
+					if (obj[i][key] || chain) {
+						setValue(obj[i], key, val);
 					} else {
 						// create the new object in-place of the old one
-						//@ts-ignore
 						obj[i] = { '_id': id}
-						//@ts-ignore
-						obj[i][key] = val
+						setValue(obj[i], key, val);
 					}
 				}
 			}
+			valueSet = true;
 		}
 
 		// check for an array
@@ -57,7 +61,7 @@ export const update = (baseObj: object, updateObj: object): object => {
 			if (pathArr[0].split('[')[1].length > 1) {
 				id = pathArr[0].split('[')[1].split(']')[0];
 			}
-			if (pathArr.length > 1) {
+			if (hasNext(pathArr)) {
 				chain = true;
 			}
 		}
@@ -67,13 +71,26 @@ export const update = (baseObj: object, updateObj: object): object => {
 			newPath.shift();
 			//@ts-ignore
 			set(obj[currentPath], newPath.join('.'), value, chain, isArr, id);
-		} else if (!isArr) {
-			if (value === null || value === undefined) {
+		}
+		else {
+			// check if we have another element to go deeper into AND if we didn't set a value
+			if (hasNext(pathArr) && !valueSet) {
+				//create a new empty object
+				setValue(obj, currentPath, {})
+			} else if(isArr && !valueSet) {
+				// delete or set, depending on the value
+				setValue(obj, currentPath, [value])
+			} else if (!isArr && !valueSet) {
+				// change/set the value 
+				setValue(obj, currentPath, value);
+			}
+			valueSet = true;
+
+			if (hasNext(pathArr)) {
+				const newPath = path.split('.');
+				newPath.shift();
 				//@ts-ignore
-				delete obj[currentPath]
-			} else {
-				//@ts-ignore
-				obj[currentPath] = value;
+				set(obj[currentPath], newPath.join('.'), value, chain, isArr, id);
 			}
 		}
 
