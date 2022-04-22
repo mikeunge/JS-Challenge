@@ -4,7 +4,7 @@ export const update = (baseObj: object, updateObj: object): object => {
 		let currentPath = pathArr[0];
 
 		if (isArr) {
-			if (id == '' || id == null) {  // check if we have an id, if not, append to array
+			if (id == '' || id === null) {  // check if we have an id, if not, append to array
 				if (Array.isArray(obj)) {
 					obj.push(value)
 				}
@@ -15,7 +15,7 @@ export const update = (baseObj: object, updateObj: object): object => {
 				//@ts-ignore
 				if (obj[i]._id == id) { // check if the id matches
 
-					if (value == null) {
+					if (value === null || value === undefined) {
 						if (Array.isArray(obj)) {
 							obj.splice(i, 1);
 						}
@@ -68,8 +68,13 @@ export const update = (baseObj: object, updateObj: object): object => {
 			//@ts-ignore
 			set(obj[currentPath], newPath.join('.'), value, chain, isArr, id);
 		} else if (!isArr) {
-			//@ts-ignore
-			obj[currentPath] = value;
+			if (value === null || value === undefined) {
+				//@ts-ignore
+				delete obj[currentPath]
+			} else {
+				//@ts-ignore
+				obj[currentPath] = value;
+			}
 		}
 
 		return obj;

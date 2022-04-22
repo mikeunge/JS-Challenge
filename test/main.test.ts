@@ -163,3 +163,50 @@ test('update regular object value', () => {
 	}
 	expect(update(baseObj, changes)).toMatchObject(updatedObj);
 });
+
+test('unset regular object value on root level', () => {
+	const baseObj = {
+		a: {
+			b: [
+				{ _id: '5dc0ad700000000000000000', name: 'asdf1' },
+				{ _id: '5dc0ad700000000000000001', name: 'asdf2' },
+				{ _id: '5dc0ad700000000000000002', name: 'asdf3' }
+			]
+		},
+		value: 'hui'
+	};
+	const changes = {
+		"value": null
+	};
+	const updatedObj = {
+		"a": {
+			"b": [
+				{ "_id": "5dc0ad700000000000000000", "name": "asdf1" },
+				{ "_id": "5dc0ad700000000000000001", "name": "asdf2" },
+				{ "_id": "5dc0ad700000000000000002", "name": "asdf3" }
+			]
+		}
+	}
+	expect(update(baseObj, changes)).toMatchObject(updatedObj);
+});
+
+test('unset regular object value NOT on root level', () => {
+	const baseObj = {
+		a: {
+			b: [
+				{ _id: '5dc0ad700000000000000000', name: 'asdf1' },
+				{ _id: '5dc0ad700000000000000001', name: 'asdf2' },
+				{ _id: '5dc0ad700000000000000002', name: 'asdf3' }
+			]
+		},
+		value: 'hui'
+	};
+	const changes = {
+		"a.b": null
+	};
+	const updatedObj = {
+		"a": {},
+		"value": "hui"
+	}
+	expect(update(baseObj, changes)).toMatchObject(updatedObj);
+});
