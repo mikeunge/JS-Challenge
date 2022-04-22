@@ -1,5 +1,5 @@
 export const update = (baseObj: object, updateObj: object): object => {
-	const set = (obj: object, path: string, value: string, chain: boolean, isArr: boolean, id: string): object => {
+	const set = (obj: object, path: string, value: string, chain: boolean, isArr: boolean, id: string, isObj: boolean): object => {
 		// setValue :: set a value or delete it, depents on the value that gets passed
 		const setValue = (obj: object, key: string, value: string | Array<string> | object | Array<null> | null) => {
 			//@ts-ignore
@@ -45,7 +45,7 @@ export const update = (baseObj: object, updateObj: object): object => {
 						setValue(obj[i], key, val);
 					} else {
 						// create the new object in-place of the old one
-						obj[i] = { '_id': id}
+						setValue(obj[i], key, {'_id': id});
 						setValue(obj[i], key, val);
 					}
 				}
@@ -66,11 +66,23 @@ export const update = (baseObj: object, updateObj: object): object => {
 			}
 		}
 
-		if (obj.hasOwnProperty(currentPath)) {
+		if (obj.hasOwnProperty(currentPath) && !isObj) {
 			const newPath = path.split('.');
 			newPath.shift();
-			//@ts-ignore
-			set(obj[currentPath], newPath.join('.'), value, chain, isArr, id);
+			// check the length for the new path and if it's an array
+			if (newPath.length < 1 && !isArr) {
+				//@ts-ignore
+				if (typeof obj[currentPath] == 'object' && !Array.isArray(obj[currentPath])) { // check if we have an object
+					//@ts-ignore
+					for (const [k, v] of Object.entries(obj[currentPath])) {
+						//@ts-ignore
+						set(obj[currentPath], k, value, chain, isArr, id, true);
+					}
+				}
+			} else {
+				//@ts-ignore
+				set(obj[currentPath], newPath.join('.'), value, chain, isArr, id, false);
+			}
 		}
 		else {
 			// check if we have another element to go deeper into AND if we didn't set a value
@@ -82,7 +94,10 @@ export const update = (baseObj: object, updateObj: object): object => {
 				setValue(obj, currentPath, [value])
 			} else if (!isArr && !valueSet) {
 				// change/set the value 
-				setValue(obj, currentPath, value);
+				isObj
+					//@ts-ignore
+					? setValue(obj, currentPath, value[currentPath])
+					: setValue(obj, currentPath, value);
 			}
 			valueSet = true;
 
@@ -90,7 +105,7 @@ export const update = (baseObj: object, updateObj: object): object => {
 				const newPath = path.split('.');
 				newPath.shift();
 				//@ts-ignore
-				set(obj[currentPath], newPath.join('.'), value, chain, isArr, id);
+				set(obj[currentPath], newPath.join('.'), value, chain, isArr, id, false);
 			}
 		}
 
@@ -99,7 +114,7 @@ export const update = (baseObj: object, updateObj: object): object => {
 
 	// loop over the object that contains the chagnes
 	for (const [k, v] of Object.entries(updateObj)) {
-		set(baseObj, k, v, false, false, '');
+		set(baseObj, k, v, false, false, '', false);
 	}
 
 	return baseObj;
