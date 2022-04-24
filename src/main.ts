@@ -1,3 +1,12 @@
+/**
+ * update() {...}
+ * 
+ * update() takes in two objects, the baseObj (gets mutated) and an updateObj.
+ * 
+ * @param baseObj
+ * @param updateObj 
+ * @returns (mutated) baseObj
+ */
 export const update = (baseObj: object, updateObj: object): object => {
 	const set = (obj: object, path: string, value: string, chain: boolean, isArr: boolean, id: string, isObj: boolean): object => {
 		// setValue :: set a value or delete it, depents on the value that gets passed
@@ -14,8 +23,8 @@ export const update = (baseObj: object, updateObj: object): object => {
 		}
 
 		// isEmpty :: do we have a value or not
-		const isEmpty = (e: string | null): boolean => {
-			return e == '' || e === null || e === undefined ? true : false;
+		const isEmpty = (e: string | Array<string> | object | Array<null> | null): boolean => {
+			return e === '' || e === null || e === undefined ? true : false;
 		}
 
 		const pathArr = path.split('.');
@@ -24,7 +33,7 @@ export const update = (baseObj: object, updateObj: object): object => {
 
 		if (isArr && Array.isArray(obj)) {
 			if (isEmpty(id)) {  // check if we have an id, if not, append to array
-				obj.push(value)
+				obj.push(value);
 				return obj;
 			}
 
@@ -39,7 +48,7 @@ export const update = (baseObj: object, updateObj: object): object => {
 
 					// if we 'chain' behind the array, we need to SET/UPDATE a value, so we set the chained value as our key
 					const key = chain ? currentPath : Object.keys(value)[0];
-					const val = Object.values(value).join('')
+					const val = Object.values(value).join('');
 
 					if (obj[i][key] || chain) {
 						setValue(obj[i], key, val);
@@ -57,7 +66,7 @@ export const update = (baseObj: object, updateObj: object): object => {
 		if (pathArr[0].split('[').length > 1) {
 			isArr = true;
 			// change the current path to the first element of the '[' split
-			currentPath = pathArr[0].split('[')[0]
+			currentPath = pathArr[0].split('[')[0];
 			if (pathArr[0].split('[')[1].length > 1) {
 				id = pathArr[0].split('[')[1].split(']')[0];
 			}
@@ -83,15 +92,14 @@ export const update = (baseObj: object, updateObj: object): object => {
 				//@ts-ignore
 				set(obj[currentPath], newPath.join('.'), value, chain, isArr, id, false);
 			}
-		}
-		else {
+		} else {
 			// check if we have another element to go deeper into AND if we didn't set a value
 			if (hasNext(pathArr) && !valueSet) {
 				//create a new empty object
-				setValue(obj, currentPath, {})
+				setValue(obj, currentPath, {});
 			} else if(isArr && !valueSet) {
 				// delete or set, depending on the value
-				setValue(obj, currentPath, [value])
+				setValue(obj, currentPath, [value]);
 			} else if (!isArr && !valueSet) {
 				// change/set the value 
 				isObj
@@ -108,7 +116,6 @@ export const update = (baseObj: object, updateObj: object): object => {
 				set(obj[currentPath], newPath.join('.'), value, chain, isArr, id, false);
 			}
 		}
-
 		return obj;
 	}
 
